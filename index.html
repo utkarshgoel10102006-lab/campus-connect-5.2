@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Campus Connect 💘 Anonymous Chat</title>
+
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<!-- Floating background hearts -->
+<div class="heart" style="left: 10%"></div>
+<div class="heart" style="left: 30%"></div>
+<div class="heart" style="left: 50%"></div>
+<div class="heart" style="left: 70%"></div>
+<div class="heart" style="left: 90%"></div>
+
+<!-- LOGIN -->
+<div id="login-card" class="card">
+  <h1 class="title">Campus Connect 💘</h1>
+  <p class="subtitle">Anonymous college chat & confessions 🚀</p>
+
+  <button id="google-login-btn" class="btn">
+    <i class="fa-brands fa-google"></i> Continue with Google
+  </button>
+  <p class="small-note">Safe • Private • Strictly No 18+ Content</p>
+</div>
+
+<!-- PROFILE -->
+<div id="profile-card" class="card hidden">
+  <h2>Create Profile 💎</h2>
+
+  <input id="username-input" class="input" placeholder="CuteNickname_07"/>
+  <button id="username-suggest-btn" class="btn secondary">Suggest Username ✨</button>
+
+  <select id="college-input" class="select">
+    <option value="">Choose College</option>
+    <option value="DTU">DTU</option>
+    <option value="NSUT">NSUT</option>
+    <option value="IIITD">IIIT Delhi</option>
+    <option value="OTHER">Other</option>
+  </select>
+
+  <select id="gender-input" class="select">
+    <option value="">Gender</option>
+    <option value="boy">Boy</option>
+    <option value="girl">Girl</option>
+  </select>
+
+  <input id="year-input" class="input" placeholder="2nd Year CSE"/>
+  <input id="age-input" class="input" placeholder="Age" type="number" min="18"/>
+
+  <textarea id="bio-input" class="textarea" placeholder="Tell about yourself…"></textarea>
+  <button id="bio-suggest-btn" class="btn secondary">Suggest Bio ✨</button>
+
+  <h3 style="margin-top:12px;">Choose Avatar 🧸</h3>
+  <div id="avatar-container" class="avatar-grid"></div>
+
+  <input id="referral-input" class="input" placeholder="Referral Code (optional)"/>
+
+  <button id="save-profile-btn" class="btn">Save & Continue ❤️</button>
+</div>
+
+<!-- MAIN APP -->
+<div id="app-card" class="card hidden main-app">
+
+  <div class="app-header">
+    <h1>Campus Connect 💘</h1>
+    <button id="logout-btn" class="btn secondary tiny">Logout</button>
+  </div>
+
+  <div id="user-pill"></div>
+
+  <div class="app-layout">
+
+    <div class="panel">
+      <h3>Matches 💖</h3>
+      <div id="matches-list" class="list"></div>
+      <button id="open-swipe-btn" class="btn secondary">Swipe Mode</button>
+    </div>
+
+    <div class="panel">
+      <h3 id="chat-title">Chat 💬</h3>
+      <div id="messages" class="list"></div>
+      <div class="chat-input-row">
+        <input id="chat-input" class="chat-input" placeholder="Message…"/>
+        <button id="send-btn" class="btn tiny">➤</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Confessions 🎭</h3>
+      <textarea id="confession-input" class="textarea"></textarea>
+      <button id="post-confession-btn" class="btn">Post</button>
+      <div id="confessions-list" class="list"></div>
+
+      <h3>Leaderboard 👑</h3>
+      <div id="leaderboard-list" class="list"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SWIPE MODAL -->
+<div id="swipe-overlay" class="hidden">
+  <div class="swipe-card">
+    <h2 id="swipe-username"></h2>
+    <p id="swipe-meta"></p>
+    <p id="swipe-bio"></p>
+    <div class="swipe-actions">
+      <button id="swipe-skip-btn" class="swipe-btn skip">✖</button>
+      <button id="swipe-like-btn" class="swipe-btn like">❤</button>
+    </div>
+    <button id="swipe-close-btn" class="btn secondary">Close</button>
+  </div>
+</div>
+
+<!-- MATCH POPUP -->
+<div id="match-popup" class="hidden">
+  <div id="match-popup-content">
+    🎉 It's a Match 🎉<br><br>
+    You & <span id="match-name"></span> like each other 💗<br><br>
+    <button id="match-close-btn" class="btn">Start Chatting</button>
+  </div>
+</div>
+
+<!-- Firebase + JS Modules -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script src="js/firebase.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/profile.js"></script>
+<script src="js/suggestions.js"></script>
+<script src="js/avatar.js"></script>
+<script src="js/referrals.js"></script>
+<script src="js/swipe.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/confessions.js"></script>
+<script src="js/leaderboard.js"></script>
+<script src="js/reports.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+
+</body>
+</html>
