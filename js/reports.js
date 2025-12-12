@@ -1,28 +1,54 @@
-// reports.js
+// reports.js (complete)
 
-async function reportUser(id) {
-  const confirmReport = confirm("Report this user?");
-  if (!confirmReport) return;
+// reportUser prevents double-reporting and increments reports atomically.
+// Usage: call reportUser(targetUserId)
+async function reportUser(targetUserId) {
+  try {
+    if (!currentUser) { alert("Sign in to report"); return; }
+    if (!targetUserId) return;
 
-  const reportPath = `${id}_${currentUser.uid}`;
-  const repRef = db.collection("reports").doc(reportPath);
+    const confirmReport = confirm("Report this user for violating rules?");
+    if (!confirmReport) return;
 
-  if ((await repRef.get()).exists) {
-    alert("⚠ You already reported this user");
-    return;
-  }
+    const reportDocId = `${targetUserId}_${currentUser.uid}`;
+    const repRef = db.collection("reports").doc(reportDocId);
+    const targetRef = db.collection("users").doc(targetUserId);
 
-  await repRef.set({ reported: id, reporter: currentUser.uid });
+    const res = await db.runTransaction(async (tx) => {
+      const existing = await tx.get(repRef);
+      if (existing.exists) {
+        return { already: true };
+      }
+      tx.set(repRef, {
+        reported: targetUserId,
+        reporter: currentUser.uid,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
 
-  await db.collection("users").doc(id)
-    .update({ reports: firebase.firestore.FieldValue.increment(1) });
+      const targetSnap = await tx.get(targetRef);
+      const currentReports = (targetSnap.exists && targetSnap.data().reports) ? targetSnap.data().reports : 0;
+      const newReports = currentReports + 1;
+      tx.update(targetRef, { reports: newReports });
 
-  const snap = await db.collection("users").doc(id).get();
+      if (newReports >= 3) {
+        tx.update(targetRef, { banned: true });
+      }
 
-  if (snap.data().reports >= 3) {
-    await db.collection("users").doc(id).update({ banned: true });
-    alert("🚫 User banned due to multiple reports");
-  } else {
-    alert("Report Submitted");
+      return { already: false, newReports };
+    });
+
+    if (res.already) {
+      alert("⚠ You have already reported this user.");
+      return;
+    }
+
+    if (res.newReports >= 3) {
+      alert("User has been banned due to multiple reports.");
+    } else {
+      alert("Report submitted. Thank you.");
+    }
+  } catch (err) {
+    console.error("Reporting failed", err);
+    alert("Could not submit report. Try again later.");
   }
 }
