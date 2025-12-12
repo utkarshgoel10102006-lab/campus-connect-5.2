@@ -1,76 +1,49 @@
-// swipe.js
+// leaderboard.js (complete)
 
-let swipeUsers = [];
-let swipeIndex = 0;
+let unsubscribeLeaderboard = null;
 
-$("open-swipe-btn").addEventListener("click", () => {
-  if (swipeUsers.length === 0) {
-    alert("No profiles available right now");
-    return;
-  }
-
-  swipeIndex = 0;
-  showSwipe();
-  $("swipe-overlay").classList.remove("hidden");
-});
-
-$("swipe-close-btn").addEventListener("click", () => {
-  $("swipe-overlay").classList.add("hidden");
-});
-
-$("swipe-like-btn").addEventListener("click", () => swipe("like"));
-$("swipe-skip-btn").addEventListener("click", () => swipe("skip"));
-
-function showSwipe() {
-  if (swipeIndex >= swipeUsers.length) {
-    $("swipe-username").innerHTML = "No more profiles 😢";
-    $("swipe-meta").innerText = "";
-    $("swipe-bio").innerText = "Invite more users and earn points!";
-    return;
-  }
-
-  const u = swipeUsers[swipeIndex];
-
-  $("swipe-username").innerHTML = `
-    <img src="assets/avatars/${u.avatar}" style="width:85px;height:85px;border-radius:50%;margin-bottom:6px;">
-    <br>${u.username}
-  `;
-  $("swipe-meta").innerText = `${u.year} • ${u.points} pts`;
-  $("swipe-bio").innerText = u.bio;
-}
-
-async function swipe(type) {
-  const target = swipeUsers[swipeIndex];
-  swipeIndex++;
-  showSwipe();
-
-  await db.collection("swipes").add({
-    fromId: currentUser.uid,
-    toId: target.id,
-    type,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-  if (type === "like") {
-    const mutual = await db.collection("swipes")
-      .where("fromId", "==", target.id)
-      .where("toId", "==", currentUser.uid)
-      .where("type", "==", "like")
-      .get();
-
-    if (!mutual.empty) {
-      $("match-name").innerText = target.username;
-      $("match-popup").classList.remove("hidden");
-      launchConfetti();
-      matchSound.play();
-      vibrate(120);
-
-      await db.collection("users").doc(currentUser.uid)
-        .update({ points: firebase.firestore.FieldValue.increment(10) });
+function subscribeLeaderboard() {
+  try {
+    if (unsubscribeLeaderboard) {
+      try { unsubscribeLeaderboard(); } catch (e) { /* ignore */ }
     }
+
+    if (!profile) {
+      const list = document.getElementById("leaderboard-list");
+      if (list) list.innerHTML = `<div class="bubble">Leaderboard will appear after profile setup</div>`;
+      return;
+    }
+
+    unsubscribeLeaderboard = db.collection("users")
+      .where("college", "==", profile.college)
+      .orderBy("points", "desc")
+      .limit(30)
+      .onSnapshot(snapshot => {
+        const list = document.getElementById("leaderboard-list");
+        if (!list) return;
+        list.innerHTML = "";
+        let rank = 1;
+
+        snapshot.forEach(doc => {
+          const u = doc.data();
+          const div = document.createElement("div");
+          div.className = "bubble";
+          div.innerHTML = `
+            <div style="display:flex;align-items:center;gap:10px;">
+              <img src="assets/avatars/${u.avatar || 'avatar1.png'}" style="width:34px;height:34px;border-radius:50%;">
+              #${rank} ${u.username || 'Unknown'} — ${u.points || 0} pts (${u.referralCount || 0} invites)
+            </div>
+          `;
+          list.appendChild(div);
+          rank++;
+        });
+      }, err => {
+        console.error("Leaderboard snapshot error", err);
+      });
+
+    // register unsubscribe cleanup (so safeSignOut can clear)
+    if (typeof addUnsubscribe === "function") addUnsubscribe(unsubscribeLeaderboard);
+  } catch (err) {
+    console.error("subscribeLeaderboard failed", err);
   }
 }
-
-$("match-close-btn").addEventListener("click", () => {
-  $("match-popup").classList.add("hidden");
-});
