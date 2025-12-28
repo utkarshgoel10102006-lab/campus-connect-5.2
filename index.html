@@ -5,230 +5,84 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Campus Connect — Find People</title>
 
-  <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Firebase + libs -->
+  <!-- Firebase (optional if you use later) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-  <!-- CryptoJS for AES -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-
-  <!-- App scripts (load firebase.js first) -->
-  <script defer src="firebase.js"></script>
-  <script defer src="auth.js"></script>
-  <script defer src="avatar.js"></script>
-  <script defer src="profile.js"></script>
-  <script defer src="swipe.js"></script>
-  <script defer src="chat.js"></script>
-  <script defer src="leadorboard.js"></script>
-  <script defer src="reports.js"></script>
-  <script defer src="confessions.js"></script>
-  <script defer src="animation.js"></script>
-
-  <meta name="author" content="Campus Connect" />
 </head>
+
 <body>
-  <!-- Top nav -->
+
+  <!-- Header -->
   <header class="topbar">
     <div class="brand">
-      <img src="assets/logo-heart.png" alt="" class="logo"/>
+      <img src="assets/logo-heart.png" class="logo"/>
       <span class="brand-text">Campus Connect</span>
     </div>
 
     <div class="top-actions">
-      <div id="user-pill" class="pill">Guest</div>
-      <button id="google-login-btn" class="btn small">Sign in</button>
-      <button id="logout-btn" class="btn small hidden">Logout</button>
-      <div class="points"><span class="trophy">🏆</span> <span id="points-badge">0</span></div>
+      <div class="pill">Guest</div>
+      <button class="btn small">Sign in</button>
+
+      <div class="points">
+        <span>🏆</span>
+        <span>50</span>
+      </div>
     </div>
   </header>
 
-  <!-- Main hero -->
+  <!-- Main Hero -->
   <main class="hero">
-    <section class="ui-card hero-card">
+    <section class="hero-card ui-card">
       <div class="hero-icon">🔍</div>
+
       <h1>Find Love</h1>
-      <p class="muted">You are a <span class="pill small">Male</span> seeking <span class="pill small">Females</span>.</p>
-      <button id="open-swipe-btn" class="btn-primary">Start Matching 💘</button>
+
+      <p>
+        You are a
+        <span class="pill small">Male</span>
+        seeking
+        <span class="pill small">Females</span>.
+      </p>
+
+      <button class="btn-primary">
+        Start Matching 💘
+      </button>
     </section>
   </main>
 
-  <!-- App layout -->
-  <div class="app-grid">
-    <!-- Left: Chat & Confessions -->
-    <aside class="left-col">
-      <div class="card section">
-        <div class="section-title">Chat</div>
-        <div id="matches-list" class="matches-list">
-          <!-- list of .match-item inserted by other scripts -->
-        </div>
-      </div>
-
-      <div class="card section">
-        <div class="section-title">Confessions</div>
-        <div id="confessions-list" class="confessions-list">
-          <!-- confessions inserted by confessions.js -->
-        </div>
-        <div class="confess-input">
-          <input id="confession-input" placeholder="Share anonymously..." />
-          <button id="post-confession-btn" class="btn small">Post</button>
-        </div>
-      </div>
-    </aside>
-
-    <!-- Center: main chat / swipe area -->
-    <section class="center-col">
-      <div id="app-card" class="card hidden">
-        <!-- When profile exists, app content shows -->
-        <div id="swipe-area" class="swipe-card ui-card">
-          <div id="swipe-username" class="swipe-username">Welcome — click Start Matching</div>
-          <div id="swipe-meta" class="muted"></div>
-          <div id="swipe-bio" class="muted small"></div>
-          <div class="swipe-controls">
-            <button id="swipe-skip-btn" class="btn">Skip</button>
-            <button id="swipe-like-btn" class="btn btn-primary">Like</button>
-            <button id="swipe-undo-btn" class="btn">Undo</button>
-          </div>
-        </div>
-
-        <div id="messages-wrap" class="chat-wrap">
-          <h3 id="chat-title">Chat 💬</h3>
-          <div id="messages" class="messages" role="log" aria-live="polite"></div>
-
-          <div class="message-input">
-            <input id="chat-input" placeholder="Say hi..." aria-label="Type a message" />
-            <button id="send-btn" class="btn-primary">Send</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- If profile not created, show profile-card -->
-      <div id="profile-card" class="card profile-card hidden" role="dialog" aria-modal="true" aria-labelledby="profile-title">
-        <h2 id="profile-title">Create Your Love Profile</h2>
-        <div class="form-row">
-          <label for="username-input">Nickname</label>
-          <input id="username-input" placeholder="e.g. Mystery Lover" />
-        </div>
-
-        <div class="form-row two-cols">
-          <div>
-            <label for="gender-input">I am a...</label>
-            <select id="gender-input">
-              <option>Boy</option>
-              <option>Girl</option>
-              <option>Other</option>
-            </select>
-          </div>
-          <div>
-            <label for="looking-input">Looking for...</label>
-            <select id="looking-input">
-              <option>Girls</option>
-              <option>Boys</option>
-              <option>Everyone</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <label>Choose your Avatar</label>
-          <div id="avatar-container" class="avatar-strip" tabindex="0" aria-label="Choose avatar"></div>
-        </div>
-
-        <div class="form-row two-cols">
-          <div>
-            <label for="college-input">College</label>
-            <select id="college-input">
-              <option>DTU</option>
-              <option>Other</option>
-            </select>
-          </div>
-          <div>
-            <label for="year-input">Year</label>
-            <select id="year-input">
-              <option>1st Year</option>
-              <option>2nd Year</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <label for="bio-input">Flirty Bio 😉</label>
-          <textarea id="bio-input" rows="3" placeholder="Write something fun..."></textarea>
-        </div>
-
-        <div class="form-row two-cols">
-          <div>
-            <label for="age-input">Age</label>
-            <input id="age-input" type="number" min="18" max="120" value="18" />
-          </div>
-          <div>
-            <label for="referral-input">Referral code (optional)</label>
-            <input id="referral-input" placeholder="ABCD12" />
-          </div>
-        </div>
-
-        <div class="form-row actions">
-          <button id="save-profile-btn" class="btn-primary">Save Profile</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Right: Leaderboard / admin links -->
-    <aside class="right-col">
-      <div class="card section">
-        <div class="section-title">Leaderboard</div>
-        <div id="leaderboard-list" class="leaderboard-list"></div>
-      </div>
-
-      <div class="card section">
-        <div class="section-title">Quick</div>
-        <button class="btn" onclick="location.href='admin.html'">Admin</button>
-      </div>
-    </aside>
-  </div>
-
-  <!-- Swipe overlay (for mobile) -->
-  <div id="swipe-overlay" class="overlay hidden" role="dialog" aria-modal="true">
-    <div class="overlay-inner ui-card">
-      <button id="swipe-close-btn" class="btn small">Close</button>
-      <div id="swipe-username" class="swipe-username"></div>
-      <div id="swipe-meta" class="muted"></div>
-      <div id="swipe-bio" class="muted small"></div>
-      <div class="swipe-controls">
-        <button id="swipe-skip-btn" class="btn">Skip</button>
-        <button id="swipe-like-btn" class="btn btn-primary">Like</button>
-        <button id="swipe-undo-btn" class="btn">Undo</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Match popup -->
-  <div id="match-popup" class="match-popup hidden">
-    <div class="ui-card">
-      <h3>It's a match! 🎉</h3>
-      <p id="match-name">Someone</p>
-      <div style="text-align:center;margin-top:12px;">
-        <button id="match-close-btn" class="btn-primary">Continue</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Admin quick area (hidden unless signed-in as admin) -->
-  <div id="admin-btns" class="admin-quick hidden" aria-hidden="true">
-    <a href="admin.html" class="btn small">Admin Panel</a>
-  </div>
-
-  <!-- Footer (mobile nav placeholder) -->
+  <!-- Footer Bottom Nav -->
   <footer class="bottom-nav">
-    <div class="nav-item active">Chat</div>
-    <div class="nav-item">Confess</div>
-    <div class="nav-item">Fun</div>
-    <div class="nav-item">Tops</div>
-    <div class="nav-item">Profile</div>
+
+    <div class="nav-item active">
+      <span class="nav-icon">💬</span>
+      <span class="nav-text">Chat</span>
+    </div>
+
+    <div class="nav-item">
+      <span class="nav-icon">🙊</span>
+      <span class="nav-text">Confess</span>
+    </div>
+
+    <div class="nav-item">
+      <span class="nav-icon">🎮</span>
+      <span class="nav-text">Fun</span>
+    </div>
+
+    <div class="nav-item">
+      <span class="nav-icon">🏆</span>
+      <span class="nav-text">Tops</span>
+    </div>
+
+    <div class="nav-item">
+      <span class="nav-icon">👤</span>
+      <span class="nav-text">Profile</span>
+    </div>
+
   </footer>
+
 </body>
 </html>
